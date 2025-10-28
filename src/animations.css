@@ -1,0 +1,51 @@
+/* Custom animations for copy feedback */
+@keyframes copy-pop {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-4px) scale(1.05);
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.copy-animate {
+  will-change: transform;
+  animation: copy-pop 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  display: inline-block;
+}
+
+.copy-animate::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: hsl(var(--primary) / 0.1);
+  border-radius: 8px;
+  opacity: 0;
+  animation: fade-out 400ms ease-out;
+}
+
+.copy-animate-input {
+  will-change: transform;
+  animation: copy-pop 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+}
+
+.copy-animate-input::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: hsl(var(--primary) / 0.1);
+  border-radius: 6px;
+  opacity: 0;
+  animation: fade-out 400ms ease-out;
+}
