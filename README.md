@@ -3,7 +3,7 @@
 </p>
 <p align="center"><h1 align="center">TEMP-MAIL.GIT</h1></p>
 <p align="center">
-	<em><code>❯ REPLACE-ME</code></em>
+	<em><code>❯BY NayanRajput</code></em>
 </p>
 <p align="center">
 	<!-- Shields.io badges disabled, using skill icons. --></p>
