@@ -1,7 +1,5 @@
-import { Globe, Sun, Moon, User, LogOut } from 'lucide-react';
+import { Globe, Sun, Moon, User, LogOut, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { copyToClipboard } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,10 +7,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useState, useEffect } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 
 interface TopBarProps {
   email: string;
   onLogout: () => void;
+  language: string;
+  onLanguageChange: (lang: string) => void;
+  translations: any;
 }
 
 const languages = [
@@ -24,10 +26,10 @@ const languages = [
   { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 
-export default function TopBar({ email, onLogout }: TopBarProps) {
-  const { toast } = useToast();
+export default function TopBar({ email, onLogout, language, onLanguageChange, translations }: TopBarProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [language, setLanguage] = useState('en');
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
@@ -44,22 +46,40 @@ export default function TopBar({ email, onLogout }: TopBarProps) {
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
-  const handleCopy = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const ok = await copyToClipboard(email);
+  const copyEmail = () => {
     try {
-      const el = e.currentTarget as HTMLElement;
-      el.classList.add('copy-animate');
-      setTimeout(() => el.classList.remove('copy-animate'), 520);
-    } catch (err) {
-      /* ignore */
-    }
-
-    if (ok) {
-      toast({ title: 'Copied!', description: 'Email copied to clipboard.' });
-    } else {
-      toast({ title: 'Copy Failed', description: 'Please copy the email manually.', variant: 'destructive' });
+      // Create a temporary input element
+      const input = document.createElement('input');
+      input.value = email;
+      input.style.position = 'absolute';
+      input.style.left = '-9999px';
+      document.body.appendChild(input);
+      
+      // Select and copy
+      input.select();
+      input.setSelectionRange(0, 99999); // For mobile devices
+      const success = document.execCommand('copy');
+      
+      // Clean up
+      document.body.removeChild(input);
+      
+      if (success) {
+        setCopied(true);
+        toast({
+          title: translations.copied || "Copied!",
+          description: translations.emailCopied || "Email address copied to clipboard",
+        });
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        throw new Error('Copy command failed');
+      }
+    } catch (error) {
+      console.error('Copy failed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to copy email",
+        variant: "destructive",
+      });
     }
   };
 
@@ -67,14 +87,15 @@ export default function TopBar({ email, onLogout }: TopBarProps) {
     <div className="h-16 border-b bg-background flex items-center justify-between px-6">
       <div className="flex items-center gap-2">
         <Mail className="w-5 h-5 text-muted-foreground" />
-        <span
-          onClick={handleCopy}
-          role="button"
-          title="Click to copy email"
-          className="font-mono text-sm cursor-pointer select-all"
+        <span className="font-mono text-sm">{email}</span>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8"
+          onClick={copyEmail}
         >
-          {email}
-        </span>
+          {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+        </Button>
       </div>
 
       <div className="flex items-center gap-2">
@@ -92,7 +113,7 @@ export default function TopBar({ email, onLogout }: TopBarProps) {
             {languages.map((lang) => (
               <DropdownMenuItem
                 key={lang.code}
-                onClick={() => setLanguage(lang.code)}
+                onClick={() => onLanguageChange(lang.code)}
                 className={language === lang.code ? 'bg-accent' : ''}
               >
                 <span className="mr-2">{lang.flag}</span>
@@ -111,7 +132,7 @@ export default function TopBar({ email, onLogout }: TopBarProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onLogout}>
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              {translations.logout}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

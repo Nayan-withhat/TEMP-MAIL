@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Copy, Mail, Loader2, Eye, EyeOff } from 'lucide-react';
-import { copyToClipboard } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { mailTmApi, Account } from '@/services/mailTmApi';
 
@@ -53,21 +52,34 @@ export default function EmailGenerator({ onEmailGenerated }: EmailGeneratorProps
     }
   };
 
-  const handleCopy = async (text: string, label: string, e?: React.MouseEvent) => {
+  const handleCopy = async (text: string, label: string) => {
     try {
-      const ok = await copyToClipboard(text);
-      if (e && e.currentTarget) {
-        const el = e.currentTarget as HTMLElement;
-        el.classList.add('copy-animate-input');
-        setTimeout(() => el.classList.remove('copy-animate-input'), 500);
-      }
-      if (ok) {
-        toast({ title: 'Copied!', description: `${label} copied to clipboard.` });
-      } else {
-        toast({ title: 'Copy Failed', description: `Please manually copy the ${label.toLowerCase()}.`, variant: 'destructive' });
-      }
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: 'Copied!',
+        description: `${label} copied to clipboard.`,
+      });
     } catch (error) {
-      toast({ title: 'Copy Failed', description: `Please manually copy the ${label.toLowerCase()}.`, variant: 'destructive' });
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast({
+          title: 'Copied!',
+          description: `${label} copied to clipboard.`,
+        });
+      } catch (err) {
+        toast({
+          title: 'Copy Failed',
+          description: `Please manually copy the ${label.toLowerCase()}.`,
+          variant: 'destructive',
+        });
+      }
+      document.body.removeChild(textArea);
     }
   };
 
@@ -92,12 +104,10 @@ export default function EmailGenerator({ onEmailGenerated }: EmailGeneratorProps
                   id="email"
                   value={generatedAccount.address} 
                   readOnly 
-                  className="font-mono text-sm cursor-pointer" 
-                  onClick={(e) => handleCopy(generatedAccount.address, 'Email', e)}
-                  title="Click to copy email"
+                  className="font-mono text-sm" 
                 />
                 <Button 
-                  onClick={(e) => handleCopy(generatedAccount.address, 'Email', e)} 
+                  onClick={() => handleCopy(generatedAccount.address, 'Email')} 
                   variant="outline" 
                   size="icon"
                 >
@@ -132,7 +142,7 @@ export default function EmailGenerator({ onEmailGenerated }: EmailGeneratorProps
                   </Button>
                 </div>
                 <Button 
-                  onClick={(e) => handleCopy(generatedAccount.password, 'Password', e)} 
+                  onClick={() => handleCopy(generatedAccount.password, 'Password')} 
                   variant="outline" 
                   size="icon"
                 >

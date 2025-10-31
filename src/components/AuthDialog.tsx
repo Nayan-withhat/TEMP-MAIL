@@ -202,7 +202,7 @@ export default function AuthDialog({ open, onClose, onAuthenticated }: AuthDialo
               <Input
                 id="login-email"
                 type="email"
-                placeholder="your-email@XaRath-Temp"
+                placeholder="your-email@mail.tm"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleLogin()}

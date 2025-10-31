@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 interface SidebarProps {
   onRefresh: () => void;
   onGenerateNew: () => void;
+  translations: any;
 }
 
-export default function Sidebar({ onRefresh, onGenerateNew }: SidebarProps) {
+export default function Sidebar({ onRefresh, onGenerateNew, translations }: SidebarProps) {
   return (
     <div className="w-64 bg-[#1a1f3a] text-white h-screen flex flex-col p-4">
       <div className="mb-8">
@@ -15,7 +16,7 @@ export default function Sidebar({ onRefresh, onGenerateNew }: SidebarProps) {
             <Mail className="w-5 h-5" />
           </div>
           <h1 className="text-xl font-bold">
-            <span className="text-blue-400">@</span>mail<span className="text-blue-400">.tm</span>
+            <span className="text-blue-400">@</span>XaRath-Temp<span className="text-blue-400">.com</span>
           </h1>
         </div>
       </div>
@@ -27,7 +28,7 @@ export default function Sidebar({ onRefresh, onGenerateNew }: SidebarProps) {
           onClick={onGenerateNew}
         >
           <Mail className="w-5 h-5 mr-3" />
-          Inbox
+          {translations.inbox}
         </Button>
         
         <Button
@@ -36,15 +37,7 @@ export default function Sidebar({ onRefresh, onGenerateNew }: SidebarProps) {
           onClick={onRefresh}
         >
           <RefreshCw className="w-5 h-5 mr-3" />
-          Refresh
-        </Button>
-
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-blue-400 hover:bg-white/10"
-        >
-          <Rocket className="w-5 h-5 mr-3" />
-          Custom Domain Support
+          {translations.refresh}
         </Button>
       </nav>
 
@@ -55,7 +48,7 @@ export default function Sidebar({ onRefresh, onGenerateNew }: SidebarProps) {
             alt="Ad" 
             className="w-full h-32 object-cover rounded mb-2"
           />
-          <p className="text-xs text-gray-400">Advertisement</p>
+          <p className="text-xs text-gray-400">{translations.advertisement}</p>
         </div>
       </div>
     </div>
